@@ -10,6 +10,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -32,6 +33,12 @@ public class AuthenticationService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+
+    @Value("${cookie.secure:false}")
+    private boolean cookieSecure;
+
+    @Value("${cookie.same-site:Lax}")
+    private String cookieSameSite;
 
     @Autowired
     public AuthenticationService(AuthenticationRepository authenticationRepository,
@@ -67,13 +74,13 @@ public class AuthenticationService {
         JWTToken jwtTokenEntity = new JWTToken(user.getUid(), token, createdTime, expireTime);
         authenticationRepository.save(jwtTokenEntity);
 
-        // Create HTTP-Only Cookie
+        // Create HTTP-Only Cookie with dynamic security settings
         ResponseCookie cookie = ResponseCookie.from(COOKIE_NAME, token)
                 .httpOnly(true)
-                .secure(false) // localhost dev
+                .secure(cookieSecure)
                 .path("/")
                 .maxAge(Duration.ofDays(1))
-                .sameSite("Lax")
+                .sameSite(cookieSameSite)
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
@@ -116,10 +123,10 @@ public class AuthenticationService {
         // Clear HTTP-Only Cookie
         ResponseCookie clearCookie = ResponseCookie.from(COOKIE_NAME, "")
                 .httpOnly(true)
-                .secure(false)
+                .secure(cookieSecure)
                 .path("/")
                 .maxAge(0)
-                .sameSite("Lax")
+                .sameSite(cookieSameSite)
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, clearCookie.toString());
