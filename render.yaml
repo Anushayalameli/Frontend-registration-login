@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: reglog-backend
+    runtime: docker
+    rootDir: Backend
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: COOKIE_SECURE
+        value: true
+      - key: COOKIE_SAME_SITE
+        value: None
+      - key: AIVEN_DB_NAME
+        value: defaultdb
+      - key: AIVEN_DB_USERNAME
+        value: avnadmin
+      - key: AIVEN_DB_HOST
+        sync: false
+      - key: AIVEN_DB_PORT
+        sync: false
+      - key: AIVEN_DB_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
