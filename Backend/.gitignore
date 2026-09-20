@@ -1,4 +1,6 @@
 target/
 *.class
 .env
+.env.*
+*.env
 application-local.properties
