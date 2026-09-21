@@ -50,8 +50,12 @@ const Login = () => {
       }
     } catch (err) {
       console.error('Login failed:', err);
-      const serverMsg = err.response?.data?.message || err.response?.data || 'Invalid username or password.';
-      setError(typeof serverMsg === 'string' ? serverMsg : 'Login failed. Please try again.');
+      if (!err.response) {
+        setError('Network error: Unable to reach the backend server. If the server was sleeping, please wait a moment and try again.');
+      } else {
+        const serverMsg = err.response?.data?.message || err.response?.data || 'Invalid username or password.';
+        setError(typeof serverMsg === 'string' ? serverMsg : 'Login failed. Please check your credentials.');
+      }
     } finally {
       setLoading(false);
     }

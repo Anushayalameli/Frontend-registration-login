@@ -79,8 +79,12 @@ const Signup = () => {
       }
     } catch (err) {
       console.error('Registration error:', err);
-      const serverMsg = err.response?.data?.message || err.response?.data || 'Failed to register. Please check your inputs.';
-      setError(typeof serverMsg === 'string' ? serverMsg : JSON.stringify(serverMsg));
+      if (!err.response) {
+        setError('Network error: Unable to reach the backend server. If the server was sleeping, please wait a moment and try again.');
+      } else {
+        const serverMsg = err.response?.data?.message || err.response?.data || 'Failed to register. Please check your inputs.';
+        setError(typeof serverMsg === 'string' ? serverMsg : JSON.stringify(serverMsg));
+      }
     } finally {
       setLoading(false);
     }
